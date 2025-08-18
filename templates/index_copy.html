@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GenAI Contract Analyzer or Book Summarizer</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; max-width: 900px; margin: auto; padding: 20px; background-color: #f7f8fa; color: #333; }
+        .container { background-color: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        h1 { color: #1a1a1a; text-align: center; }
+        .upload-form { margin: 30px 0; padding: 20px; border: 2px dashed #ccc; border-radius: 8px; text-align: center; }
+        .results-container { margin-top: 30px; }
+        .brief-container { border: 1px solid #e0e0e0; padding: 25px; border-radius: 8px; background-color: #fdfdfd; }
+        .brief-container h2 { margin-top: 0; color: #0056b3; }
+        .brief-container ul, .brief-container ol { line-height: 1.6; }
+        .details-toggle { cursor: pointer; color: #0056b3; text-decoration: underline; margin-top: 20px; display: inline-block; }
+        .details-table { display: none; margin-top: 20px; width: 100%; border-collapse: collapse; }
+        .details-table th, .details-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        .details-table th { background-color: #f2f2f2; }
+        .risk-High { color: #dc3545; font-weight: bold; }
+        .risk-Medium { color: #ffc107; font-weight: bold; }
+        .risk-Low { color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GenAI Contract Analyzer</h1>
+        <p style="text-align:center;">Upload a contract (.pdf) to generate an executive brief, risk assessment and detailed summary sheet.</p>
+        <div class="upload-form">
+            <form method="post" enctype="multipart/form-data">
+                <input type="file" name="contract_file" required accept=".pdf">
+                <input type="submit" value="Analyze Contract">
+            </form>
+        </div>
+
+        {% if analysis %}
+        <div class="results-container">
+            <h2>Analysis for: <strong>{{ analysis.filename }}</strong></h2>
+            
+            <!-- Executive Brief -->
+            <div class="brief-container">
+                <h2>Executive Brief</h2>
+                {{ analysis.executive_brief_html | safe }}
+            </div>
+
+            <!-- Detailed, Collapsible Section -->
+            <div id="details-toggle" class="details-toggle" onclick="toggleDetails()">Show Detailed Clause Analysis ▼</div>
+            <table id="details-table" class="details-table">
+                <tr><th>Preview</th><th>Type</th><th>Risk</th><th>Summary</th></tr>
+                {% for item in analysis.detailed_analysis %}
+                <tr>
+                    <td>{{ item.chunk_preview }}...</td>
+                    <td>{{ item.type }}</td>
+                    <td class="risk-{{ item.risk }}">{{ item.risk }}</td>
+                    <td>{{ item.summary }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleDetails() {
+            var table = document.getElementById('details-table');
+            var toggle = document.getElementById('details-toggle');
+            if (table.style.display === 'none' || table.style.display === '') {
+                table.style.display = 'table';
+                toggle.textContent = 'Hide Detailed Clause Analysis ▲';
+            } else {
+                table.style.display = 'none';
+                toggle.textContent = 'Show Detailed Clause Analysis ▼';
+            }
+        }
+    </script>
+</body>
+</html>

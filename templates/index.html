@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Aura | AI Document Intelligence</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #64748b;
+            --secondary-hover: #475569;
+            --background-color: #f1f5f9;
+            --card-background: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --risk-high: #ef4444;
+            --risk-medium: #f97316;
+            --risk-low: #22c55e;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header h1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .header .material-symbols-outlined {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+        .header h2 {
+            font-size: 1.75rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+        .header p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+        }
+
+        .upload-card {
+            background-color: var(--card-background);
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+        
+        .file-drop-zone {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            border: 2px dashed var(--border-color);
+            border-radius: 0.75rem;
+            padding: 3rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+        .file-drop-zone.dragover {
+            border-color: var(--primary-color);
+            background-color: #f4f4f5;
+        }
+        .file-drop-zone .material-symbols-outlined {
+            font-size: 3rem;
+            color: var(--primary-color);
+        }
+        .file-drop-zone p {
+            margin: 0.5rem 0 0 0;
+            color: var(--text-secondary);
+        }
+        .file-drop-zone strong {
+            color: var(--primary-color);
+        }
+        #file-input { display: none; }
+        #file-name { margin-top: 1rem; font-weight: 500; color: var(--text-secondary); }
+
+        .button-group { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+        .action-btn { color: white; border: none; border-radius: 0.5rem; padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s ease; }
+        .action-btn:active { transform: scale(0.97); }
+        .analyze-btn { background-color: var(--primary-color); }
+        .analyze-btn:hover { background-color: var(--primary-hover); }
+        .summarize-btn { background-color: var(--secondary-color); }
+        .summarize-btn:hover { background-color: var(--secondary-hover); }
+        
+        .loader { display: none; text-align: center; padding: 3rem; }
+        .spinner { border: 4px solid #e5e7eb; border-top: 4px solid var(--primary-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 1rem auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .results-container { margin-top: 3rem; }
+        .download-section { text-align: right; margin-bottom: 1.5rem; }
+        .analysis-card { background: var(--card-background); padding: 1.5rem 2rem; border-radius: 0.75rem; box-shadow: var(--shadow); margin-bottom: 2rem; }
+        .analysis-card h2 { font-size: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-top: 0; margin-bottom: 1.5rem; font-weight: 600; }
+        /* Markdown generated content styling */
+        .markdown-content h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; }
+        .markdown-content ul, .markdown-content ol { line-height: 1.7; padding-left: 1.5rem; }
+        .markdown-content li::marker { color: var(--primary-color); }
+
+        .details-toggle { cursor: pointer; color: var(--primary-color); font-weight: 600; margin-top: 1rem; display: inline-flex; align-items: center; gap: 0.25rem; }
+        .details-toggle .material-symbols-outlined { transition: transform 0.2s ease; }
+        .details-toggle.expanded .material-symbols-outlined { transform: rotate(180deg); }
+
+        #details-table { display: none; margin-top: 1.5rem; width: 100%; border-collapse: collapse; }
+        #details-table th, #details-table td { border: 1px solid var(--border-color); padding: 0.75rem 1rem; text-align: left; vertical-align: top; }
+        #details-table th { background-color: var(--background-color); font-weight: 600; }
+        #details-table tr:nth-child(even) { background-color: #fafafa; }
+        
+        .risk-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-weight: 600; font-size: 0.8rem; }
+        .risk-High { background-color: #fee2e2; color: #b91c1c; }
+        .risk-Medium { background-color: #ffedd5; color: #c2410c; }
+        .risk-Low { background-color: #dcfce7; color: #166534; }
+
+        .error-message { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; padding: 1rem; border-radius: 0.5rem; margin-top: 1.5rem; }
+    </style>
+</head>
+<body 
+    data-has-analysis="{{ 'true' if analysis else 'false' }}"
+    data-has-summary="{{ 'true' if summary_result else 'false' }}"
+>
+
+    <div class="container">
+        <div class="header">
+            <h1><span class="material-symbols-outlined">neurology</span> Aura</h1>
+            <h2>| GenAI Contracts Analyzer |</h2>
+            <p>Streamlining contract analysis and reducing manual review efforts.</p>
+            <p>Upload a contract document to analyze it or a Book/document to summarize it.</p>
+        </div>
+
+        <div class="upload-card">
+            <form id="upload-form" method="post" enctype="multipart/form-data">
+                <label for="file-input" class="file-drop-zone">
+                    <span class="material-symbols-outlined">upload_file</span>
+                    <p>Drag & drop your PDF here or <strong>browse files</strong></p>
+                </label>
+                <input id="file-input" type="file" name="contract_file" required accept=".pdf">
+                <div id="file-name"></div>
+                <div id="button-group" class="button-group" style="display: none;">
+                    <button type="submit" name="action" value="analyze" class="action-btn analyze-btn"><span class="material-symbols-outlined">gavel</span>Analyze Contract</button>
+                    <button type="submit" name="action" value="summarize" class="action-btn summarize-btn"><span class="material-symbols-outlined">summarize</span>Summarize PDF</button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="loader" class="loader"><div class="spinner"></div><p>Aura is thinking... This may take a moment.</p></div>
+
+        <div id="results-container" class="results-container" style="display: none;">
+            {% if analysis or summary_result %}
+                <div class="download-section">
+                    <a href="{{ url_for('download_pdf') }}" class="action-btn analyze-btn" style="text-decoration: none;">
+                        <span class="material-symbols-outlined">download</span> Download Report as PDF
+                    </a>
+                </div>
+
+                {% if analysis %}
+                    <h2>Analysis for: <strong>{{ analysis.filename }}</strong></h2>
+                    {% if analysis.error %}
+                        <div class="error-message">{{ analysis.error }}</div>
+                    {% else %}
+                        <div class="analysis-card"><div class="markdown-content">{{ analysis.executive_brief_html | safe }}</div></div>
+                        <div class="analysis-card">
+                            <h2>Detailed Clause Analysis</h2>
+                            <table id="details-table">
+                                <thead><tr><th>Preview</th><th>Type</th><th>Risk</th><th>Summary</th></tr></thead>
+                                <tbody>
+                                {% for item in analysis.detailed_analysis %}
+                                <tr><td>{{ item.chunk_preview }}...</td><td>{{ item.type }}</td><td><span class="risk-badge risk-{{ item.risk }}">{{ item.risk }}</span></td><td>{{ item.summary }}</td></tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <div id="details-toggle" class="details-toggle" onclick="toggleDetails()">Show Details <span class="material-symbols-outlined">expand_more</span></div>
+                        </div>
+                    {% endif %}
+                {% elif summary_result %}
+                    <h2>Summary for: <strong>{{ summary_result.filename }}</strong></h2>
+                    <div class="analysis-card"><div class="markdown-content">{{ summary_result.summary_html | safe }}</div></div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file-input');
+        const fileDropZone = document.querySelector('.file-drop-zone');
+        const fileNameDisplay = document.getElementById('file-name');
+        const buttonGroup = document.getElementById('button-group');
+        const loader = document.getElementById('loader');
+        
+        fileDropZone.addEventListener('dragover', (e) => { e.preventDefault(); fileDropZone.classList.add('dragover'); });
+        fileDropZone.addEventListener('dragleave', () => fileDropZone.classList.remove('dragover'));
+        fileDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileDropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileName();
+            }
+        });
+
+        uploadForm.addEventListener('submit', function(e) {
+            if (!fileInput.files.length) {
+                e.preventDefault(); // Stop form submission
+                alert("Please select a file first.");
+                return;
+            }
+            const resultsContainer = document.getElementById('results-container');
+            if (resultsContainer) { resultsContainer.style.display = 'none'; }
+            loader.style.display = 'block';
+            buttonGroup.style.display = 'none';
+        });
+
+        fileInput.addEventListener('change', updateFileName);
+
+        function updateFileName() {
+            const resultsContainer = document.getElementById('results-container');
+            if (fileInput.files.length > 0) {
+                fileNameDisplay.innerHTML = `<span class="material-symbols-outlined" style="font-size: 1em; vertical-align: middle;">description</span> ${fileInput.files[0].name}`;
+                buttonGroup.style.display = 'flex';
+                if(resultsContainer) { resultsContainer.style.display = 'none'; }
+            } else {
+                fileNameDisplay.textContent = '';
+                buttonGroup.style.display = 'none';
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            const resultsContainer = document.getElementById('results-container');
+            const hasAnalysis = document.body.dataset.hasAnalysis === 'true';
+            const hasSummary = document.body.dataset.hasSummary === 'true';
+
+            if(hasAnalysis || hasSummary) {
+                resultsContainer.style.display = 'block';
+            }
+        });
+
+        function toggleDetails() {
+            const table = document.getElementById('details-table');
+            const toggle = document.getElementById('details-toggle');
+            const isExpanded = table.style.display === 'table';
+            table.style.display = isExpanded ? 'none' : 'table';
+            toggle.classList.toggle('expanded', !isExpanded);
+            toggle.innerHTML = isExpanded ? 'Show Details <span class="material-symbols-outlined">expand_more</span>' : 'Hide Details <span class="material-symbols-outlined">expand_less</span>';
+        }
+    </script>
+</body>
+</html>

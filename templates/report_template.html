@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Analysis Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; color: #1e293b; }
+        h1 { color: #4f46e5; font-size: 2rem; text-align: center; }
+        h2 { font-size: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.5rem; margin-top: 2rem; }
+        h3 { font-size: 1.25rem; }
+        ul, ol { line-height: 1.6; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.75rem; text-align: left; vertical-align: top; }
+        th { background-color: #f1f5f9; font-weight: 600; }
+        .risk-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-weight: 600; font-size: 0.8rem; }
+        .risk-High { background-color: #fee2e2; color: #b91c1c; }
+        .risk-Medium { background-color: #ffedd5; color: #c2410c; }
+        .risk-Low { background-color: #dcfce7; color: #166534; }
+    </style>
+</head>
+<body>
+    <h1>Aura | AI Document Intelligence Report</h1>
+    <p style="text-align: center;"><strong>File Analyzed:</strong> {{ filename }}</p>
+
+    {% if analysis %}
+        <div class="markdown-content">{{ analysis.executive_brief_html | safe }}</div>
+        <h2>Detailed Clause Analysis</h2>
+        <table>
+            <thead><tr><th>Preview</th><th>Type</th><th>Risk</th><th>Summary</th></tr></thead>
+            <tbody>
+            {% for item in analysis.detailed_analysis %}
+            <tr><td>{{ item.chunk_preview }}...</td><td>{{ item.type }}</td><td><span class="risk-badge risk-{{ item.risk }}">{{ item.risk }}</span></td><td>{{ item.summary }}</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% elif summary_result %}
+        <h2>Document Summary</h2>
+        <div class="markdown-content">{{ summary_result.summary_html | safe }}</div>
+    {% endif %}
+</body>
+</html>
